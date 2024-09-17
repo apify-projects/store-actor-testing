@@ -22,6 +22,7 @@ const { log } = Apify.utils;
  *  name?: string,
  *  options?: Parameters<Apify.callTask>[2]
  *  nonce?: string
+ *  prefilledInput?: boolean
  * }} RunParams
  */
 
@@ -39,7 +40,7 @@ const isRunResult = (run) => (
  */
 const formatRunMessage = (runResult) => (message) => {
     const namePart = runResult.data.name ? `${runResult.data.name}\n` : '';
-    const taskOrActorPart = runResult.data.taskName ? `${runResult.data.taskName} - ${runResult.data.actorName}` : runResult.data.actorName
+    const taskOrActorPart = runResult.data.taskName ? `${runResult.data.taskName} - ${runResult.data.actorName}` : runResult.data.actorName;
     const runLink = createRunLink({
         actorId: runResult.data.actId,
         taskId: runResult.data.taskId,
