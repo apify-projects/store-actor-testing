@@ -237,6 +237,25 @@ Apify.main(async () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = defaultTimeout;
     const runFn = await setupRun({ Apify, client, verboseLogs, retryFailedTests, customData });
 
+    const getTestableMiniactors = async (repoName) => {
+        let miniactorsList;
+        // For PR tests from GitHub CI, we want to run only specific Actors that were changed (we got builds for them)
+        if (customData.buildIds) {
+            // This list has Actor names and IDs so we want only one of them (names)
+            miniactorsList = Object.keys(customData.buildIds).filter((nameOrId) => nameOrId.includes('/'));
+        } else {
+            // For scheduled latest tests, we want to run all Actors
+            const record = await client.keyValueStore('ftXklt2f2mN30Oc3y').getRecord(repoName);
+            if (!record) {
+                throw new Error(`[getTestableMiniactors]: No record found for '${repoName}'. Have you spelled it correctly? It should be name of the repo, e.g. 'facebook'`);
+            }
+            miniactorsList = record.value;
+        }
+        const miniactorsListType = input.customData.buildIds ? 'GitHub CI input' : 'updated KV store list';
+        console.log(`Loading miniactors list from ${miniactorsListType}: ${JSON.stringify(miniactorsList)}`);
+        return miniactorsList;
+    };
+
     // jasmine executes everything as global, so we just eval it here
     ((context) => {
         const { describe, beforeAll } = context;
@@ -269,6 +288,7 @@ Apify.main(async () => {
                 apifyClient: client,
                 type,
                 parseAsSchema,
+                getTestableMiniactors,
             });
         });
     })({
