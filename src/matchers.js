@@ -327,7 +327,7 @@ const withDataset = async ({ result, value, args, client, format }) => {
 
     return callbackValue({
         value,
-        args: { dataset, info },
+        args: { dataset, info, format },
         format,
     });
 };
