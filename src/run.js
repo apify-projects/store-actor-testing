@@ -112,7 +112,8 @@ const setupRun = async ({ Apify, client, verboseLogs = false, retryFailedTests =
 
         // If GitHub CI sends us list of buildIds (happens on PR) but not the one for this Actor, it means there were no relevant changes for this Actor and we should skip this test
         // NOTE: The test spec needs to count with this! Ideally, it should only run Actors in buildIds list or it has to handle that we return skip
-        if (Object.keys(customData.buildIds || {}).length > 0 && !buildId) {
+        // Users can pass in options.build if they want to override this behavior
+        if (Object.keys(customData.buildIds || {}).length > 0 && !buildId && !options.build) {
             console.log(`[${actorId || actorIdOfTask}] Skipping test. GitHub CI didn't send us build ID for this which means it doesn't need to be tested because there were no relevant code changes`);
             return {
                 wasSkipped: true,
