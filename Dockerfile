@@ -1,4 +1,4 @@
-FROM apify/actor-node:18
+FROM apify/actor-node:23
 
 # Second, copy just package.json and package-lock.json since they are the only files
 # that affect NPM install in the next step
