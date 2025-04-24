@@ -128,7 +128,8 @@ Apify.main(async () => {
 
     // testSpec string can be in TS so we compile it to JS
     writeFileSync('testSpec.ts', input.testSpec);
-    spawnSync('npx', ['tsc', 'testSpec.ts'], { stdio: 'inherit' });
+    // We ignore any TS errors, TS will emit JS by default
+    spawnSync('npx', ['tsc', 'testSpec.ts'], { stdio: 'ignore' });
     input.testSpec = readFileSync('testSpec.js', 'utf-8');
 
     // hacking jasmine internals to accept non-existing files
