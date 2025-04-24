@@ -13,6 +13,8 @@ import { setupJasmine } from './matchers.js';
 import setupRun from './run.js';
 import JSONReporter from './collector.js';
 import { collectFailed, nameBreak, createNotifier, createRunLink } from './common.js';
+import { spawnSync } from 'child_process';
+import { writeFileSync, readFileSync } from 'fs';
 
 const { log } = Apify.utils;
 
@@ -123,6 +125,11 @@ Apify.main(async () => {
     if (!input.testSpec) {
         throw new Error('Missing required input "testSpec" parameter');
     }
+
+    // testSpec string can be in TS so we compile it to JS
+    writeFileSync('testSpec.ts', input.testSpec);
+    spawnSync('npx', ['tsc', 'testSpec.ts'], { stdio: 'inherit' });
+    input.testSpec = readFileSync('testSpec.js', 'utf-8');
 
     // hacking jasmine internals to accept non-existing files
     const instance = new Jasmine({
