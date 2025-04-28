@@ -1,4 +1,5 @@
 import Apify from 'apify';
+import { Actor } from 'apify';
 import Jasmine from 'jasmine';
 import { ApifyClient } from 'apify-client';
 import escapeRegex from 'escape-string-regexp';
@@ -129,7 +130,8 @@ Apify.main(async () => {
     // testSpec string can be in TS so we compile it to JS
     writeFileSync('testSpec.ts', input.testSpec);
     // We ignore any TS errors, TS will emit JS by default
-    spawnSync('npx tsc --target es2020 --module preserve --isolatedModules false testSpec.ts', { stdio: 'ignore', shell: true });
+    const result = spawnSync('npx tsc --target es2020 --module preserve --isolatedModules false testSpec.ts', { stdio: 'pipe', shell: true });
+    Actor.setValue('TS_RESULT', result);
     input.testSpec = readFileSync('testSpec.js', 'utf-8');
 
     // hacking jasmine internals to accept non-existing files
