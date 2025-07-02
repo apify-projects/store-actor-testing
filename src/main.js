@@ -1,4 +1,3 @@
-import { ACTOR_PERMISSION_LEVEL } from '@apify/consts';
 import Apify from 'apify';
 import Jasmine from 'jasmine';
 import { ApifyClient } from 'apify-client';
@@ -41,12 +40,6 @@ Apify.main(async () => {
     const client = new ApifyClient({
         token,
     });
-
-    if (customData.runWithLimitedPermissions) {
-        // @ts-expect-error
-        // eslint-disable-next-line no-underscore-dangle
-        client.params._unsafeForcePermissionLevel = ACTOR_PERMISSION_LEVEL.LIMITED_PERMISSIONS;
-    }
 
     if (verboseLogs) {
         log.info('Current input', input);
