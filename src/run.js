@@ -1,3 +1,4 @@
+import { ACTOR_PERMISSION_LEVEL } from '@apify/consts';
 import ApifyNM from 'apify'; // eslint-disable-line
 import { ApifyClient } from 'apify-client'; // eslint-disable-line
 import { XXHash64 } from 'xxhash-addon';
@@ -134,14 +135,16 @@ const setupRun = async ({ Apify, client, verboseLogs = false, retryFailedTests =
         if (!runMap.has(id)) {
             // looks duplicated code, but we need to run it once,
             // as it shouldn't run when there's a migration
-            const runInfo = await client[isTask ? 'task' : 'actor'](taskId || actorId).call({
-                ...prefill,
-                ...input,
-            }, {
-                build,
-                ...options,
-                waitSecs: 0,
-            });
+            // @ts-ignore
+            const actorClient = client[isTask ? 'task' : 'actor'](taskId || actorId);
+
+            if (customData.runWithLimitedPermissions) {
+                actorClient.params = actorClient.params ?? {};
+                // eslint-disable-next-line no-underscore-dangle
+                actorClient.params._unsafeForcePermissionLevel = ACTOR_PERMISSION_LEVEL.LIMITED_PERMISSIONS;
+            }
+
+            const runInfo = await actorClient.call({ ...prefill, ...input }, { build, ...options, waitSecs: 0 });
 
             const { name: actorName } = await client.actor(runInfo.actId).get();
             const { name: taskName } = isTask && taskId ? await client.task(taskId).get() : {};
